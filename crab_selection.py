@@ -16,14 +16,18 @@ secondCrabCount = 0
 thirdCrabCount = 0
 for question in range(0, 6):
 	print("Koks tu krabas?")
-	buf = random.choice(answers)
-	t = (buf & 0b000000000011)
-	if t == 1: 
-		firstCrab+=1
-	elif t == 2:
-		secondCrab+=1
-	elif t == 3:
-		thirdCrab+=1
+
+	for wheelPosition in range(0, 6):
+		print wheelPosition
+		buf = random.choice(answers)
+		t = (buf & 0b000000000011)
+		if t == 1: 
+			firstCrab+=1
+		elif t == 2:
+			secondCrab+=1
+		elif t == 3:
+			thirdCrab+=1
+		buf = buf >> 2
 	crabCount = firstCrab + secondCrab + thirdCrab
 	firstCrabCount+= firstCrab/crabCount
 	secondCrabCount+= secondCrab/crabCount
