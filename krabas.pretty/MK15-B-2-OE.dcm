@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP MK15-B-2-OE
+D Proximity Sensors SPST-NCSurface Mnt Sensor 1 Form B
+K
+F https://standexelectronics.com/wp-content/uploads/datasheet_reed_sensor_MK15.pdf
+$ENDCMP
+#
+#End Doc Library

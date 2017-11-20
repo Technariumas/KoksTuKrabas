@@ -1,0 +1,25 @@
+EESchema-LIBRARY Version 2.3
+#encoding utf-8
+#SamacSys ECAD Model MK15-B-2-OE
+#/872848/26636/2.16/2/4/Integrated Circuit
+DEF MK15-B-2-OE IC 0 30 Y Y 1 F N
+F0 "IC" 350 150 50 H V C CNN
+F1 "MK15-B-2-OE" 350 -150 50 H V C CNN
+F2 "SOP100P1950X375-2N" 350 -250 50 H I C CNN
+F3 "https://standexelectronics.com/wp-content/uploads/datasheet_reed_sensor_MK15.pdf" 350 -350 50 H I C CNN
+F4 "Proximity Sensors SPST-NCSurface Mnt Sensor 1 Form B" 350 -450 50 H I C CNN "Description"
+F5 "RS" 350 -550 50 H I C CNN "Supplier_Name"
+F6 "" 350 -650 50 H I C CNN "RS Part Number"
+F7 "Standex-Meder Electronics" 350 -750 50 H I C CNN "Manufacturer_Name"
+F8 "MK15-B-2-OE" 350 -850 50 H I C CNN "Manufacturer_Part_Number"
+F9 "" 350 -950 50 H I C CNN "Allied_Number"
+F10 "" 350 -1050 50 H I C CNN "Other Part Number"
+F11 "3.75" 550 -1150 50 H I C CNN "Height"
+DRAW
+S 200 100 500 -100 0 0 10 f
+X 1 1 0 0 200 R 50 50 0 0 U
+X 2 2 700 0 200 L 50 50 0 0 U
+ENDDRAW
+ENDDEF
+#
+#End Library
