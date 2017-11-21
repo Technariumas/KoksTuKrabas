@@ -85,7 +85,7 @@ U 1 1 5A18F272
 P 7650 3200
 F 0 "J1" H 7730 3192 50  0000 L CNN
 F 1 "Conn_01x06" H 7730 3101 50  0000 L CNN
-F 2 "Connectors_IDC:IDC-Header_2x03_Pitch2.54mm_Straight" H 7650 3200 50  0001 C CNN
+F 2 "Connectors_IDC:IDC-Header_2x03_Pitch2.54mm_Angled" H 7650 3200 50  0001 C CNN
 F 3 "~" H 7650 3200 50  0001 C CNN
 F 4 "?" H 7650 3200 60  0001 C CNN "PartNo"
 F 5 "?" H 7650 3200 60  0001 C CNN "Manufacturer"

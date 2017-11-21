@@ -116,10 +116,10 @@ Wire Wire Line
 	7450 3000 7350 3000
 Connection ~ 7350 3100
 $Comp
-L Mechanical:Mounting_Hole MK?
+L Mechanical:Mounting_Hole MK1
 U 1 1 5A18F99D
 P 8650 3850
-F 0 "MK?" H 8750 3896 50  0000 L CNN
+F 0 "MK1" H 8750 3896 50  0000 L CNN
 F 1 "Mounting_Hole" H 8750 3805 50  0000 L CNN
 F 2 "Mounting_Holes:MountingHole_3.2mm_M3" H 8650 3850 50  0001 C CNN
 F 3 "" H 8650 3850 50  0001 C CNN
@@ -130,10 +130,10 @@ F 6 "?" H 8650 3850 60  0001 C CNN "Distributor"
 	1    0    0    -1  
 $EndComp
 $Comp
-L Mechanical:Mounting_Hole MK?
+L Mechanical:Mounting_Hole MK2
 U 1 1 5A18F9F1
 P 8650 4050
-F 0 "MK?" H 8750 4096 50  0000 L CNN
+F 0 "MK2" H 8750 4096 50  0000 L CNN
 F 1 "Mounting_Hole" H 8750 4005 50  0000 L CNN
 F 2 "Mounting_Holes:MountingHole_3.2mm_M3" H 8650 4050 50  0001 C CNN
 F 3 "" H 8650 4050 50  0001 C CNN
@@ -144,10 +144,10 @@ F 6 "?" H 8650 4050 60  0001 C CNN "Distributor"
 	1    0    0    -1  
 $EndComp
 $Comp
-L Mechanical:Mounting_Hole MK?
+L Mechanical:Mounting_Hole MK3
 U 1 1 5A18FA15
 P 8650 4250
-F 0 "MK?" H 8750 4296 50  0000 L CNN
+F 0 "MK3" H 8750 4296 50  0000 L CNN
 F 1 "Mounting_Hole" H 8750 4205 50  0000 L CNN
 F 2 "Mounting_Holes:MountingHole_3.2mm_M3" H 8650 4250 50  0001 C CNN
 F 3 "" H 8650 4250 50  0001 C CNN
