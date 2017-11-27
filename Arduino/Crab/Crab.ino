@@ -26,6 +26,16 @@ const int REED_PIN10 = A2;
 const int REED_PIN11 = A1;
 const int REED_PIN12 = A0;
 uint8_t digits[] = {ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, DARK};
+unsigned int firstCrab = 0;
+unsigned int secondCrab = 0;
+unsigned int thirdCrab = 0;
+unsigned int firstCrabCount = 0;
+unsigned int secondCrabCount = 0;
+unsigned int thirdCrabCount = 0;
+unsigned int firstCrabPercent = 0;
+unsigned int secondCrabPercent = 0;
+unsigned int thirdCrabPercent = 0;
+
 
 void setup() {
   Serial.begin(9600);
@@ -73,7 +83,7 @@ void readSwitches(){
   buf = buf | (digitalRead(REED_PIN10) << 9);
   buf = buf | (digitalRead(REED_PIN11) << 10);
   buf = buf | (digitalRead(REED_PIN12) << 11); 
-
+  //buf = ~buf;
 }
 
 unsigned int get_tens(unsigned int num) {
@@ -101,48 +111,27 @@ unsigned int get_single_digits(unsigned int num) {
   return sd;
 }
 
-
-
-
-void loop() {
-
-  unsigned int firstCrab = 0;
-  unsigned int secondCrab = 0;
-  unsigned int thirdCrab = 0;
-  unsigned int firstCrabCount = 0;
-  unsigned int secondCrabCount = 0;
-  unsigned int thirdCrabCount = 0;
-  unsigned int firstCrabPercent = 0;
-  unsigned int secondCrabPercent = 0;
-  unsigned int thirdCrabPercent = 0;
-  readSwitches();  
-  
-  buf = ~buf;
-  Serial.print("Initial buf value:");
-  Serial.print(buf, BIN);   
-  Serial.print("\n");
-  for (int drum=0; drum < 6; drum++){
-    Serial.print("New question, drum:");
-    Serial.print(drum);
-    Serial.print("\n");      
-
-    Serial.print("buf:"); 
-    Serial.print(buf, BIN);
-    Serial.print("\n");     
+void calculate_crabs() {
+  firstCrab = 0;
+  secondCrab = 0;
+  thirdCrab = 0;
+  for (int drum=0; drum < 6; drum++) {
     unsigned int t = (buf & 0b000000000011);
-    if (t == 1)
+    if (t == 0)
       firstCrab++;
-    if (t == 2)
+    if (t == 1)
       secondCrab++;
-    if (t == 3)
+    if (t == 2)
       thirdCrab++;
-    buf = buf >> 2;
-    Serial.print("crab answer matched:"); 
-    Serial.print(t);
-    Serial.print("\n"); 
-    firstCrabPercent = firstCrab * 100 / MAX_CRAB;
-    secondCrabPercent = secondCrab * 100 / MAX_CRAB;
-    thirdCrabPercent = thirdCrab * 100 / MAX_CRAB;
+    buf = buf >> 2;     
+    }
+  firstCrabPercent = firstCrab * 100 / MAX_CRAB;
+  secondCrabPercent = secondCrab * 100 / MAX_CRAB;
+  thirdCrabPercent = thirdCrab * 100 / MAX_CRAB;
+  Serial.println(firstCrabPercent);  
+  }
+
+void display_crabs() {
     digitalWrite(10, LOW);
     SPI.transfer(digits[get_single_digits(firstCrabPercent)]);
     SPI.transfer(digits[get_tens(firstCrabPercent)]);  
@@ -150,8 +139,19 @@ void loop() {
     SPI.transfer(digits[get_tens(secondCrabPercent)]);
     SPI.transfer(digits[get_single_digits(thirdCrabPercent)]);
     SPI.transfer(digits[get_tens(thirdCrabPercent)]);
-    digitalWrite(10, HIGH);        
-  }
-  delay(2000);
+    digitalWrite(10, HIGH);  
 }
+
+
+void loop() {
+  readSwitches();    
+  Serial.print("Initial buf value:");
+  Serial.print(buf, BIN);   
+  Serial.print("\n");
+  calculate_crabs();
+  display_crabs();
+  delay(200);
+}
+
+
 
