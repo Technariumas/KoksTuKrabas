@@ -91,6 +91,9 @@ unsigned int get_tens(unsigned int num) {
   if (num == 100) {
     tens = 9;
   }
+  else if (num == 0) {
+    tens = 10;
+  }
   else {
     tens = num/10;
   }
@@ -101,9 +104,6 @@ unsigned int get_single_digits(unsigned int num) {
   unsigned int sd = 0;
   if (num == 100) {
     sd = 9;
-  }
-  else if (num == 0) {
-    sd = 10;
   }
   else {
     sd = num % 10;
