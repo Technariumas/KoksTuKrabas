@@ -9,6 +9,7 @@
 #define SEVEN 0b11000010
 #define EIGHT 0b11111110
 #define NINE  0b11110110
+#define DARK  0b00000000
 
 int MAX_CRAB = 6;
 
@@ -24,7 +25,7 @@ const int REED_PIN9 = A3;
 const int REED_PIN10 = A2;
 const int REED_PIN11 = A1;
 const int REED_PIN12 = A0;
-uint8_t digits[] = {ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE};
+uint8_t digits[] = {ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, DARK};
 
 void setup() {
   Serial.begin(9600);
@@ -57,20 +58,22 @@ uint16_t buf;
 
 void readSwitches(){
   buf=0;
-  buf = buf | digitalRead(REED_PIN1) << 0;
-  buf = buf | digitalRead(REED_PIN2) << 1;
-  buf = buf | digitalRead(REED_PIN3) << 2;
-  buf = buf | digitalRead(REED_PIN4) << 3;
-  buf = buf | digitalRead(REED_PIN5) << 4;
-  buf = buf | digitalRead(REED_PIN6) << 5;  
-  buf = buf | digitalRead(REED_PIN7) << 6;
-  buf = buf | digitalRead(REED_PIN8) << 7;
-  buf = buf | digitalRead(REED_PIN9) << 8;
-  buf = buf | digitalRead(REED_PIN10) << 9;
-  buf = buf | digitalRead(REED_PIN11) << 10;
-  buf = buf | digitalRead(REED_PIN12) << 11;  
-  Serial.println("reed switch buffer:");
-  Serial.println(buf);
+ // Serial.println("reed switch buffer:");
+ // Serial.println(buf, BIN);  
+  buf = buf | (digitalRead(REED_PIN1) << 0);
+ // Serial.println(buf, BIN);
+  buf = buf | (digitalRead(REED_PIN2) << 1);
+  buf = buf | (digitalRead(REED_PIN3) << 2);
+  buf = buf | (digitalRead(REED_PIN4) << 3);
+  buf = buf | (digitalRead(REED_PIN5) << 4);
+  buf = buf | (digitalRead(REED_PIN6) << 5);  
+  buf = buf | (digitalRead(REED_PIN7) << 6);
+  buf = buf | (digitalRead(REED_PIN8) << 7);
+  buf = buf | (digitalRead(REED_PIN9) << 8);
+  buf = buf | (digitalRead(REED_PIN10) << 9);
+  buf = buf | (digitalRead(REED_PIN11) << 10);
+  buf = buf | (digitalRead(REED_PIN12) << 11); 
+
 }
 
 unsigned int get_tens(unsigned int num) {
@@ -89,6 +92,9 @@ unsigned int get_single_digits(unsigned int num) {
   if (num == 100) {
     sd = 9;
   }
+  else if (num == 0) {
+    sd = 10;
+  }
   else {
     sd = num % 10;
   }
@@ -99,8 +105,7 @@ unsigned int get_single_digits(unsigned int num) {
 
 
 void loop() {
-  Serial.println("********************************");  
-  readSwitches();
+
   unsigned int firstCrab = 0;
   unsigned int secondCrab = 0;
   unsigned int thirdCrab = 0;
@@ -110,11 +115,9 @@ void loop() {
   unsigned int firstCrabPercent = 0;
   unsigned int secondCrabPercent = 0;
   unsigned int thirdCrabPercent = 0;
-  unsigned int answers[] = {0b011111110101, 0b010110101001, 0b111111111101, 0b101010010101};
-  unsigned int ind = random(0, 3);
-  Serial.println("ind:");
-  Serial.println(ind);
-  unsigned int buf = answers[ind];
+  readSwitches();  
+  
+  buf = ~buf;
   Serial.print("Initial buf value:");
   Serial.print(buf, BIN);   
   Serial.print("\n");
@@ -147,9 +150,8 @@ void loop() {
     SPI.transfer(digits[get_tens(secondCrabPercent)]);
     SPI.transfer(digits[get_single_digits(thirdCrabPercent)]);
     SPI.transfer(digits[get_tens(thirdCrabPercent)]);
-    digitalWrite(10, HIGH);    
-    
-  delay(5000);
+    digitalWrite(10, HIGH);        
   }
+  delay(2000);
 }
 
