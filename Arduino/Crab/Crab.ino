@@ -1,6 +1,6 @@
 #include<SPI.h>
 #define ZERO  0b11101110
-#define ONE   0b00101000
+#define ONE   0b10000010
 #define TWO   0b11011100
 #define THREE 0b11010110
 #define FOUR  0b10110010
@@ -36,6 +36,12 @@ unsigned int firstCrabPercent = 0;
 unsigned int secondCrabPercent = 0;
 unsigned int thirdCrabPercent = 0;
 
+uint8_t crabIndex[6][3] = {{2, 1, 3},
+                           {3, 2, 1},
+                           {1, 3, 2}, 
+                           {2, 1, 3}, 
+                           {1, 3, 2}, 
+                           {1, 3, 2}};
 
 void setup() {
   Serial.begin(9600);
@@ -83,7 +89,7 @@ void readSwitches(){
   buf = buf | (digitalRead(REED_PIN10) << 9);
   buf = buf | (digitalRead(REED_PIN11) << 10);
   buf = buf | (digitalRead(REED_PIN12) << 11); 
-  //buf = ~buf;
+  buf = ~buf;
 }
 
 unsigned int get_tens(unsigned int num) {
@@ -117,28 +123,31 @@ void calculate_crabs() {
   thirdCrab = 0;
   for (int drum=0; drum < 6; drum++) {
     unsigned int t = (buf & 0b000000000011);
-    if (t == 0)
+    if (t == crabIndex[drum][0])
       firstCrab++;
-    if (t == 1)
+    if (t == crabIndex[drum][1])
       secondCrab++;
-    if (t == 2)
+    if (t == crabIndex[drum][2])
       thirdCrab++;
     buf = buf >> 2;     
     }
   firstCrabPercent = firstCrab * 100 / MAX_CRAB;
   secondCrabPercent = secondCrab * 100 / MAX_CRAB;
   thirdCrabPercent = thirdCrab * 100 / MAX_CRAB;
-  Serial.println(firstCrabPercent);  
+ 
   }
 
 void display_crabs() {
     digitalWrite(10, LOW);
+   
+    SPI.transfer(digits[get_single_digits(thirdCrabPercent)]);
+    SPI.transfer(digits[get_tens(thirdCrabPercent)]);
     SPI.transfer(digits[get_single_digits(firstCrabPercent)]);
     SPI.transfer(digits[get_tens(firstCrabPercent)]);  
     SPI.transfer(digits[get_single_digits(secondCrabPercent)]);
-    SPI.transfer(digits[get_tens(secondCrabPercent)]);
-    SPI.transfer(digits[get_single_digits(thirdCrabPercent)]);
-    SPI.transfer(digits[get_tens(thirdCrabPercent)]);
+    SPI.transfer(digits[get_tens(secondCrabPercent)]);   
+
+
     digitalWrite(10, HIGH);  
 }
 
@@ -150,7 +159,7 @@ void loop() {
   Serial.print("\n");
   calculate_crabs();
   display_crabs();
-  delay(200);
+  //delay(50);
 }
 
 
