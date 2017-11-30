@@ -1,4 +1,6 @@
 #include<SPI.h>
+#include <Bounce2.h>
+
 #define ZERO  0b11101110
 #define ONE   0b10000010
 #define TWO   0b11011100
@@ -25,6 +27,8 @@ const int REED_PIN9 = A3;
 const int REED_PIN10 = A2;
 const int REED_PIN11 = A1;
 const int REED_PIN12 = A0;
+const int BUTTON = 2;
+
 uint8_t digits[] = {ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, DARK};
 unsigned int firstCrab = 0;
 unsigned int secondCrab = 0;
@@ -42,6 +46,8 @@ uint8_t crabIndex[6][3] = {{2, 1, 3},
                            {2, 1, 3}, 
                            {1, 3, 2}, 
                            {1, 3, 2}};
+
+Bounce button = Bounce(BUTTON, 100);
 
 void setup() {
   Serial.begin(9600);
@@ -64,16 +70,18 @@ void setup() {
   pinMode(REED_PIN10, INPUT);
   pinMode(REED_PIN11, INPUT);  
   pinMode(REED_PIN12, INPUT);
+
+  pinMode(BUTTON, INPUT_PULLUP);
   
   SPI.begin();
   SPI.setDataMode(SPI_MODE0);
   digitalWrite(6, LOW);  
 }
 
-uint16_t buf;
 
-void readSwitches(){
-  buf=0;
+
+uint16_t readSwitches(){
+  uint16_t buf = 0;
  // Serial.println("reed switch buffer:");
  // Serial.println(buf, BIN);  
   buf = buf | (digitalRead(REED_PIN1) << 0);
@@ -90,6 +98,7 @@ void readSwitches(){
   buf = buf | (digitalRead(REED_PIN11) << 10);
   buf = buf | (digitalRead(REED_PIN12) << 11); 
   buf = ~buf;
+  return buf;
 }
 
 unsigned int get_tens(unsigned int num) {
@@ -117,7 +126,7 @@ unsigned int get_single_digits(unsigned int num) {
   return sd;
 }
 
-void calculate_crabs() {
+void calculate_crabs(uint16_t buf) {
   firstCrab = 0;
   secondCrab = 0;
   thirdCrab = 0;
@@ -137,6 +146,17 @@ void calculate_crabs() {
  
   }
 
+void displayDigits(uint8_t digit1, uint8_t digit2, uint8_t digit3, uint8_t digit4, uint8_t digit5, uint8_t digit6) {
+    digitalWrite(10, LOW);
+    SPI.transfer(digit1);
+    SPI.transfer(digit2);
+    SPI.transfer(digit3);
+    SPI.transfer(digit4);  
+    SPI.transfer(digit5);
+    SPI.transfer(digit6);   
+    digitalWrite(10, HIGH);  
+}
+
 void display_crabs() {
     digitalWrite(10, LOW);
    
@@ -151,16 +171,72 @@ void display_crabs() {
     digitalWrite(10, HIGH);  
 }
 
+uint32_t lastDrumChangeTs = 0;
+enum {STATE_IDLE, STATE_PLAY} state = STATE_IDLE;
+#define TIMEOUT_INTERVAL 15000
+uint16_t drumState, newDrumState;
+
+void  playStartAnimation() {
+  displayDigits(ZERO, DARK, ZERO, DARK, ZERO, DARK);
+  delay(50);
+  displayDigits(DARK, DARK, DARK, DARK, DARK, DARK);
+  delay(50);
+  displayDigits(ZERO, DARK, ZERO, DARK, ZERO, DARK);
+  delay(50);
+  displayDigits(DARK, DARK, DARK, DARK, DARK, DARK);
+  delay(50);
+  displayDigits(ZERO, DARK, ZERO, DARK, ZERO, DARK);
+  delay(50);
+}
 
 void loop() {
-  readSwitches();    
-  Serial.print("Initial buf value:");
-  Serial.print(buf, BIN);   
-  Serial.print("\n");
-  calculate_crabs();
-  display_crabs();
-  //delay(50);
+  button.update();
+  
+  newDrumState = readSwitches();
+  
+  switch(state) {
+    case STATE_IDLE:
+      if(button.fell()) {
+        playStartAnimation();
+      }
+      if(newDrumState != drumState) {
+        state = STATE_PLAY;         
+      }
+      break;
+    case STATE_PLAY:
+      if(newDrumState != drumState) {
+        drumState = newDrumState;
+        lastDrumChangeTs = millis();
+        calculate_crabs(drumState);
+        display_crabs();
+      }
+
+      if(millis() - lastDrumChangeTs > TIMEOUT_INTERVAL){
+        state = STATE_IDLE;
+        firstCrabPercent = 0;
+        secondCrabPercent = 0;
+        thirdCrabPercent = 0;
+        display_crabs();
+
+      }
+
+      if(button.fell()){
+        state = STATE_IDLE;
+        playStartAnimation();        
+      }
+      break;
+  }
 }
+
+//void loop2() {
+//  readSwitches();    
+//  Serial.print("Initial buf value:");
+//  Serial.print(drumState, BIN);   
+//  Serial.print("\n");
+//  calculate_crabs();
+//  display_crabs();
+//  //delay(50);
+//}
 
 
 
