@@ -40,6 +40,10 @@ unsigned int firstCrabPercent = 0;
 unsigned int secondCrabPercent = 0;
 unsigned int thirdCrabPercent = 0;
 
+unsigned int firstCrabDisplay = 0;
+unsigned int secondCrabDisplay = 0;
+unsigned int thirdCrabDisplay = 0;
+
 uint8_t crabIndex[6][3] = {{2, 1, 3},
                            {3, 2, 1},
                            {1, 3, 2}, 
@@ -160,20 +164,22 @@ void displayDigits(uint8_t digit1, uint8_t digit2, uint8_t digit3, uint8_t digit
 void display_crabs() {
     digitalWrite(10, LOW);
    
-    SPI.transfer(digits[get_single_digits(thirdCrabPercent)]);
-    SPI.transfer(digits[get_tens(thirdCrabPercent)]);
-    SPI.transfer(digits[get_single_digits(firstCrabPercent)]);
-    SPI.transfer(digits[get_tens(firstCrabPercent)]);  
-    SPI.transfer(digits[get_single_digits(secondCrabPercent)]);
-    SPI.transfer(digits[get_tens(secondCrabPercent)]);   
+    SPI.transfer(digits[get_single_digits(thirdCrabDisplay)]);
+    SPI.transfer(digits[get_tens(thirdCrabDisplay)]);
+    SPI.transfer(digits[get_single_digits(firstCrabDisplay)]);
+    SPI.transfer(digits[get_tens(firstCrabDisplay)]);  
+    SPI.transfer(digits[get_single_digits(secondCrabDisplay)]);
+    SPI.transfer(digits[get_tens(secondCrabDisplay)]);   
 
 
     digitalWrite(10, HIGH);  
 }
 
+uint32_t displayTs = 0;
 uint32_t lastDrumChangeTs = 0;
 enum {STATE_IDLE, STATE_PLAY} state = STATE_IDLE;
-#define TIMEOUT_INTERVAL 15000
+#define TIMEOUT_INTERVAL 30000
+#define DISPLAY_REFRESH_INTERVAL 50
 uint16_t drumState, newDrumState;
 
 void  playStartAnimation() {
@@ -189,6 +195,31 @@ void  playStartAnimation() {
   delay(50);
 }
 
+void resetCrabDisplay() {
+    firstCrabDisplay = 0;
+    secondCrabDisplay = 0;
+    thirdCrabDisplay = 0;
+}
+void updateDisplayCrabs() {
+  if(firstCrabDisplay < firstCrabPercent) {
+    firstCrabDisplay++;
+  } else if(firstCrabDisplay > firstCrabPercent) {
+    firstCrabDisplay--;
+  }
+
+  if(secondCrabDisplay < secondCrabPercent) {
+    secondCrabDisplay++;
+  } else if(secondCrabDisplay > secondCrabPercent) {
+    secondCrabDisplay--;
+  }
+
+  if(thirdCrabDisplay < thirdCrabPercent) {
+    thirdCrabDisplay++;
+  } else if(thirdCrabDisplay > thirdCrabPercent) {
+    thirdCrabDisplay--;
+  }
+}
+
 void loop() {
   button.update();
   
@@ -198,6 +229,7 @@ void loop() {
     case STATE_IDLE:
       if(button.fell()) {
         playStartAnimation();
+        resetCrabDisplay();
       }
       if(newDrumState != drumState) {
         state = STATE_PLAY;         
@@ -208,7 +240,13 @@ void loop() {
         drumState = newDrumState;
         lastDrumChangeTs = millis();
         calculate_crabs(drumState);
+        //display_crabs();
+      }
+
+      if(millis() - displayTs > DISPLAY_REFRESH_INTERVAL) {
+        updateDisplayCrabs();
         display_crabs();
+        displayTs = millis();
       }
 
       if(millis() - lastDrumChangeTs > TIMEOUT_INTERVAL){
@@ -217,12 +255,12 @@ void loop() {
         secondCrabPercent = 0;
         thirdCrabPercent = 0;
         display_crabs();
-
       }
 
       if(button.fell()){
         state = STATE_IDLE;
-        playStartAnimation();        
+        playStartAnimation();
+        resetCrabDisplay();        
       }
       break;
   }
